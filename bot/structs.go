@@ -8,13 +8,15 @@ type (
 	*/
 	Bot struct {
 		// The set of cards the bot has
-		Cards []card.Card
+		Cards []*card.Card
 		// The score of the bot
-		Score uint8
+		Score, OldScore uint8
 		// Is the bot a dealer?
 		IsDealer bool
 		// The reinforcement values in a "bot-controlling" structure
 		ControlStruct *Reinforcement
+		// The last action.
+		LastAction int
 	}
 	/*
 		A Reinforcement is a reinforcement structure.
