@@ -27,7 +27,9 @@ func main() {
 	cautionBot.Init(true)
 	brashBot.Init(true)
 	dealerWins := 0
-	for i := 0; i < 10000; i++ {
+	cautionWins := 0
+	brashWins := 0
+	for i := 0; i < 100000; i++ {
 		fmt.Println("Game number:", i+1)
 		game := game.Game{}
 		if i%2 == 0 {
@@ -39,8 +41,40 @@ func main() {
 		if result == 1 {
 			dealerWins++
 		}
+		if (int(result)+i)%2 == 0 {
+			cautionWins++
+		} else {
+			brashWins++
+		}
 	}
 	cautionBot.PrintRewards()
 	brashBot.PrintRewards()
-	fmt.Println("Number of games won by dealer:", dealerWins)
+	fmt.Println("Number of games won by dealer in training phase:", dealerWins)
+	fmt.Println("Games won by brashBot:", brashWins, " and cautionBot:", cautionWins)
+	/*
+		Some unbiased opponent acting as a dummy dealer.
+	*/
+	unBiased := &bot.Bot{}
+	unBiasedControl := &bot.Reinforcement{}
+	unBiased.ControlStruct = unBiasedControl
+
+	game := game.Game{}
+
+	brashWins = 0
+	cautionWins = 0
+	for i := 0; i < 10; i++ {
+		unBiased.Init(true)
+		game.Init(unBiased, brashBot)
+		result := game.Run()
+		if result != 1 {
+			brashWins++
+		}
+		unBiased.Init(true)
+		game.Init(unBiased, cautionBot)
+		result = game.Run()
+		if result != 1 {
+			cautionWins++
+		}
+	}
+	fmt.Println("Test result: Brashbot:", brashWins, "cautionBot:", cautionWins)
 }
