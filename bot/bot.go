@@ -26,6 +26,9 @@ func (b *Bot) Hit(deck *card.Deck) {
 		// All cards max out at 10
 		b.Score += uint8(math.Min(float64(b.Score), 10.0))
 	}
+	if b.IsDealer && b.Score < 17 {
+		b.Hit(deck)
+	}
 }
 
 func (b *Bot) Stand() {
