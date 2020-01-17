@@ -18,14 +18,14 @@ func (b *Bot) Display() []*card.Card {
 
 func (b *Bot) Hit(deck *card.Deck) {
 	// deal a card from the deck and add to this bot
-	card := deck.DealCard()
-	b.Cards = append(b.Cards, card)
-	if card.Value == 1 && b.Score < 10 {
+	newCard := deck.DealCard()
+	b.Cards = append(b.Cards, newCard)
+	if newCard.Value == 1 && b.Score <= 10 {
 		// Ace can be 11 or 1 depending on the context. We'll choose greedy and set it to bot's advantage.
 		b.Score += 11
 	} else {
 		// All cards max out at 10
-		b.Score += uint8(math.Min(float64(card.Value), 10.0))
+		b.Score += uint8(math.Min(float64(newCard.Value), 10.0))
 	}
 }
 
