@@ -17,6 +17,8 @@ type (
 		ControlStruct *Reinforcement
 		// The last action.
 		LastAction int
+		// has this bot doubled its stakes?
+		HasDoubled bool
 	}
 	/*
 		A Reinforcement is a reinforcement structure.

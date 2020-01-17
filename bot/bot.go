@@ -33,11 +33,18 @@ func (b *Bot) Stand() {
 	// Literally does nothing. One could add a penalty-ish for this, to "rig" the game?
 }
 
+func (b *Bot) Double(deck *card.Deck) {
+	// Doubles bet and hits.
+	b.HasDoubled = true
+	b.Hit(deck)
+}
+
 func (b *Bot) Init(wipeClean bool) {
 	// Init ONLY initializes for a game, does not overwrite behavior, unless wipeClean is set.
 	b.Score = 0
 	b.IsDealer = false
 	b.Cards = nil
+	b.HasDoubled = false
 	if wipeClean {
 		b.ControlStruct.Init(b.ControlStruct.Alpha, b.ControlStruct.Gamma, b.ControlStruct.RandomProb, b.ControlStruct.TempDelta)
 	}
@@ -46,26 +53,33 @@ func (b *Bot) Init(wipeClean bool) {
 func (b *Bot) ChooseBestAction(deck *card.Deck) int {
 	// Choose the best action to make for the current score the bot is in.
 	bestAction := 1
-	if b.ControlStruct.Rewards[b.Score][0] > b.ControlStruct.Rewards[b.Score][1] {
-		bestAction = 0
+	for i := 0; i < 3; i++ {
+		if b.ControlStruct.Rewards[b.Score][i] > b.ControlStruct.Rewards[b.Score][bestAction] {
+			bestAction = i
+		}
 	}
+
 	switch bestAction {
 	case 0:
 		b.Hit(deck)
 	case 1:
 		b.Stand()
+	case 2:
+		b.Double(deck)
 	}
 	return bestAction
 }
 
 func (b *Bot) ChooseRandomAction(deck *card.Deck) int {
 	// Choose a random action for the bot.
-	action := rand.Int() % 2
+	action := rand.Int() % 3
 	switch action {
 	case 0:
 		b.Hit(deck)
 	case 1:
 		b.Stand()
+	case 2:
+		b.Double(deck)
 	}
 	b.LastAction = action
 	return action
@@ -86,11 +100,14 @@ func (b *Bot) PerformAction(deck *card.Deck) int {
 	}
 	// Q-Learning!
 	reward := 0
-	if actionPerformed == 0 {
+	if actionPerformed != 1 {
 		reward = 10
 	}
 	future := b.ControlStruct.Alpha * (float64(reward) + b.GetBestReward(b.Score)*b.ControlStruct.Gamma)
 	b.ControlStruct.Rewards[b.OldScore][actionPerformed] = (1-b.ControlStruct.Alpha)*(b.ControlStruct.Rewards[b.OldScore][actionPerformed]) + future
+	if b.HasDoubled {
+		b.ControlStruct.Rewards[b.OldScore][actionPerformed] *= 2
+	}
 	// Wisdom with experience
 	b.ControlStruct.RandomProb *= b.ControlStruct.TempDelta
 	return actionPerformed

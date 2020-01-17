@@ -11,7 +11,7 @@ func main() {
 	brashGamma := 0.8
 	conservativeGamma := 0.99
 	alpha := 0.8
-	randomProb := 0.9
+	randomProb := 0.8
 	brashCoolDown := 0.99
 	cautiousCoolDown := 0.4
 

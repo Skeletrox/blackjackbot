@@ -31,7 +31,12 @@ func (g *Game) RunGame() uint8 {
 		return 1
 	}
 	for g.Dealer.Score < 22 && g.Other.Score < 22 {
-		actionPerformed := g.Other.PerformAction(g.Cards)
+		var actionPerformed int
+		if !g.Other.HasDoubled {
+			actionPerformed = g.Other.PerformAction(g.Cards)
+		} else {
+			actionPerformed = 1
+		}
 		if g.Dealer.Score < 17 {
 			g.Dealer.Hit(g.Cards)
 		} else if actionPerformed == 1 {
